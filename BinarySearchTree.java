@@ -1,3 +1,6 @@
+import java.lang.Math;
+import java.util.ArrayList;
+
 class BinarySearchTree<D extends Comparable<D>>{
 
     Node<D> root;
@@ -38,8 +41,82 @@ class BinarySearchTree<D extends Comparable<D>>{
                 return current;
             }
         }
+        current.height = 1 + Math.max(heightRecursive(current.left),
+                              heightRecursive(current.right));
+
+        //perform the self balance;
+        //
+        int balance_factor = getBalanceFactor(current);
+
+        //4 possible cases
+        if( balance_factor > 1 && data.compareTo(current.left.data) < 0){
+            return rotateRight(current); 
+        }
+        if( balance_factor < -1 && data.compareTo(current.right.data) > 0 ) {
+            return rotateLeft(current);
+        }
+        if(balance_factor > 1 && data.compareTo(current.left.data) > 0){
+            current.left = rotateLeft(current.left);
+            return rotateRight(current);
+        }
+        if(balance_factor < -1 && data.compareTo(current.right.data) < 0){
+            current.right = rotateRight(current.right);
+            return rotateLeft(current.right);
+        }
         return current;
     }
+    public boolean isBalanced(Node<D> current){
+        //tester method
+        if(current == null){
+            return true;
+        }
+        int left_h = heightRecursive(current.left);
+        int right_h = heightRecursive(current.right);
+
+        if(Math.abs(left_h - right_h) <= 2 && isBalanced(current.left) && isBalanced(current.right)){
+            return true;
+        }
+        return false;
+    }
+    public int heightRecursive(Node<D> current){
+        if(current == null){
+            return 0;
+        }
+        return current.height;
+    }
+    public Node<D> rotateLeft(Node<D> current){
+        Node new_top = current.right;
+        Node tmp = new_top.left;
+
+        new_top.left = current;
+        current.right = tmp;
+    
+        current.height = 1+Math.max(heightRecursive(current.left), heightRecursive(current.left));
+        new_top.height = 1+Math.max(heightRecursive(new_top.left), heightRecursive(new_top.right));
+
+        return new_top;
+    }
+    public Node<D> rotateRight(Node<D> current){
+        Node new_top = current.left;
+        Node tmp = new_top.right;
+
+        new_top.right = current;
+        current.left = tmp;
+
+        current.height = 1+Math.max(heightRecursive(current.left), heightRecursive(current.left));
+        new_top.height = 1+Math.max(heightRecursive(new_top.left), heightRecursive(new_top.right));
+
+        System.out.println("A "+current.height+" B "+new_top.height);
+
+        return new_top;
+    }
+    public int getBalanceFactor( Node<D> current){
+        if(current == null){
+            return 0;
+        }
+        return heightRecursive(current.left) - heightRecursive(current.right);
+    }
+
     public void delete(D data){
         this.root = deleteRecursive(this.root, data);
     }
@@ -48,7 +125,6 @@ class BinarySearchTree<D extends Comparable<D>>{
             return null;
         } 
         if(current.data.equals(data)){
-            System.out.println("!!!!!!");
             if(current.left == null && current.right == null){
                 //no children
                 return null;
@@ -58,7 +134,6 @@ class BinarySearchTree<D extends Comparable<D>>{
                     return current.right;
                 }
                 if( current.right == null){
-                    System.out.println("!!!!!!!!!!");
                     return current.left;
                 }
                 //two children
@@ -82,6 +157,7 @@ class BinarySearchTree<D extends Comparable<D>>{
         }
         return findSmallestNode(current.left);
     }
+
     public String toString(){
         return "<"+ toStringRecursive( this.root) +">";
     }
@@ -89,8 +165,8 @@ class BinarySearchTree<D extends Comparable<D>>{
         if(current == null){
             return " ";
         } else {
-            return "<"+ toStringRecursive(current.left) 
-                +" "+ current.data 
+            return "<"+ current.data
+                +" "+ toStringRecursive(current.left) 
                 +" "+ toStringRecursive(current.right) +">";
         }
     }

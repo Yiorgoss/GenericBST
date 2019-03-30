@@ -1,5 +1,6 @@
 class Node<D extends Comparable<D>>{
     D data;
+    int height;
     Node<D> left;
     Node<D> right;
 
@@ -7,17 +8,11 @@ class Node<D extends Comparable<D>>{
         this.data = data;
         this.left = null;
         this.right = null;
+        this.height = 1;
     }
     Node(D data, Node<D> left, Node<D> right){
         this.data = data;
         this.left = left;
         this.right = right;
-    }
-    public int compareTo(D data){
-        return this.data.compareTo(data);
-    }
-    public boolean eqquals(D data){
-        System.out.println("ABC");
-        return this.data.equals(data);
     }
 }
